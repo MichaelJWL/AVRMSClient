@@ -1,5 +1,0 @@
-package avrms.socket;
-
-public class WebsocketClientEndpoint {
-
-}

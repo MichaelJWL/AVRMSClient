@@ -15,10 +15,12 @@
 	<section name="FatJarPackageWizard">
 		<item value="/Users/jaeseung17/Developer/AerospaceSWProject" key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION"/>
 		<item value="SocketApp - AVRMSClient" key="FatJarPackageWizardPage.LAUNCH_CONFIGURATION_SELECTION_NAME"/>
-		<item value="/Users/jaeseung17/Desktop/AVRMSClient.jar" key="FatJarPackageWizardPage.DESTINATION_PATH_SELECTION"/>
+		<item value="/Users/jaeseung17/Desktop/AVRMSClient_1127_2.jar" key="FatJarPackageWizardPage.DESTINATION_PATH_SELECTION"/>
 		<item value="false" key="FatJarPackageWizardPage.ANTSCRIPT_SAVE"/>
 		<item value="1" key="FatJarPackageWizardPage.LIBRARY_HANDLING"/>
 		<list key="FatJarPackageWizardPage.DESTINATION_NAMES_ID">
+			<item value="/Users/jaeseung17/Desktop/AVRMSClient_1127_2.jar"/>
+			<item value="/Users/jaeseung17/Desktop/AVRMSClient_1127.jar"/>
 			<item value="/Users/jaeseung17/Desktop/AVRMSClient.jar"/>
 		</list>
 		<list key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION_HISTORY">
