@@ -1,0 +1,137 @@
+package avrms.socket.app;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.drafts.Draft_17;
+import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONException;
+import org.json.simple.*;
+
+import avrms.socket.WebsocketClientEndpoint;
+import avrms.socket.bean.NavSatFix;
+import avrms.socket.message.MAVROSMessageParser;
+
+public class SocketApp {
+	private static WebSocketClient wsc;
+	private static MAVROSMessageParser msgparser = new MAVROSMessageParser();
+	public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
+		/**
+		 * args[0] : node name
+		 * args[1] : address (#ip#:#port#/#applicationName#)- ex) 127.0.0.1:8080/avrms
+		 * args[2] : vehicle identification name 
+		 */
+		String node_name = args[0];
+		wsc = new WebSocketClient(new URI("ws://"+args[1]+"/realtime/echo.do"),new Draft_17()) {
+			Boolean approved = false;
+			@Override
+			public void onOpen(ServerHandshake arg0) {
+				// TODO Auto-generated method stub
+				System.out.println("opened");
+				Process proc;
+				Process proc_test, proc_gps,proc_state,proc_local_pos,proc_battery;
+				
+				/**
+				 * 연결 허가
+				 */
+				this.send("APPROVAL: "+args[1]);
+				
+				try {
+					JSONObject json = new JSONObject();
+					json.put("id", args[2]);
+					this.send("");
+					proc_gps = Runtime.getRuntime().exec("rostopic echo /"+node_name+"/global_position/raw/fix");
+					readOutPut(proc_gps, "gps");
+					
+					proc_state = Runtime.getRuntime().exec("rostopic echo /"+node_name+"/state");
+					readOutPut(proc_state, "state");
+					
+					proc_local_pos = Runtime.getRuntime().exec("rostopic echo /"+node_name+"/local_position/pose");
+					readOutPut(proc_local_pos, "local_pos");
+					
+					proc_battery = Runtime.getRuntime().exec("rostopic echo /"+node_name+"/battery");
+					readOutPut(proc_battery, "battery");
+					
+					proc = Runtime.getRuntime().exec("ping google.com");
+					readOutPut(proc,"test");
+					
+					proc.waitFor();
+
+				
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			
+			@Override
+			public void onMessage(String arg0) {
+				// TODO Auto-generated method stub
+				System.out.println("message arrived : "+arg0);
+			}
+			
+			@Override
+			public void onError(Exception arg0) {
+				// TODO Auto-generated method stub
+				System.out.println("error");
+			}
+			
+			@Override
+			public void onClose(int arg0, String arg1, boolean arg2) {
+				// TODO Auto-generated method stub
+				System.out.println("closed");
+			}
+		};
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			public void run() {
+				System.out.println("addShutdownHook");
+				wsc.close();
+			}
+		}));
+		wsc.connect();
+		
+        
+	}
+	public static void readOutPut(Process proc,String type) throws IOException, InterruptedException{
+    	// Read the output
+
+  	  int initialDelay = 100; // start after 0.1 seconds
+      int period = 100;        // repeat every 0.1 seconds	
+    	Timer timer = new Timer();
+  	  TimerTask task = new TimerTask() {
+  		  public void run() {
+  			BufferedReader reader =  new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			String line = "";
+			try {
+				if((line = reader.readLine()) != null){
+
+						String msg_to_send = msgparser.parseMessage(type, line);
+
+						if(msg_to_send!=null){
+							wsc.send(msg_to_send);
+							
+						}
+					
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+  		  }
+  	  };
+  	  timer.scheduleAtFixedRate(task, initialDelay, period);
+    }
+	
+}

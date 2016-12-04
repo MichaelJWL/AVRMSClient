@@ -1,0 +1,7 @@
+package key.message;
+
+public class MAVROSMessageParser {
+	public MAVROSMessageParser() {
+		// TODO Auto-generated constructor stub
+	}
+}

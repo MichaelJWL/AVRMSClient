@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename package &apos;key.message&apos; to &apos;avrms.socket.message&apos;&#x0A;- Original project: &apos;AVRMSClient&apos;&#x0A;- Original element: &apos;AVRMSClient/src/key.message&apos;&#x0A;- Renamed element: &apos;AVRMSClient/src/avrms.socket.message&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename package &apos;key.message&apos;" flags="589830" hierarchical="false" id="org.eclipse.jdt.ui.rename.package" input="/src&lt;key.message" name="avrms.socket.message" qualified="false" references="true" stamp="1480784261211" textual="false" version="1.0"/>
+</session>
