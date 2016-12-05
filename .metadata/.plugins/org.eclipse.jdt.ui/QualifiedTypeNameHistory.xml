@@ -25,7 +25,16 @@
 <fullyQualifiedTypeName name="java.util.regex.Matcher"/>
 <fullyQualifiedTypeName name="org.json.JSONObject"/>
 <fullyQualifiedTypeName name="org.json.JSONException"/>
-<fullyQualifiedTypeName name="java.util.HashMap"/>
 <fullyQualifiedTypeName name="java.lang.Runtime"/>
+<fullyQualifiedTypeName name="avrms.socket.message.MAVROSMessageParser"/>
 <fullyQualifiedTypeName name="java.lang.Thread"/>
+<fullyQualifiedTypeName name="avrms.socket.bean.Pose"/>
+<fullyQualifiedTypeName name="com.google.gson.Gson"/>
+<fullyQualifiedTypeName name="java.util.Set"/>
+<fullyQualifiedTypeName name="java.util.Iterator"/>
+<fullyQualifiedTypeName name="java.lang.Math"/>
+<fullyQualifiedTypeName name="java.lang.Double"/>
+<fullyQualifiedTypeName name="java.util.HashMap"/>
+<fullyQualifiedTypeName name="java.lang.reflect.Field"/>
+<fullyQualifiedTypeName name="org.json.simple.JSONObject"/>
 </qualifiedTypeNameHistroy>

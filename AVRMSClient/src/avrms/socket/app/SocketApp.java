@@ -18,6 +18,7 @@ import org.json.simple.*;
 
 import avrms.socket.WebsocketClientEndpoint;
 import avrms.socket.bean.NavSatFix;
+import avrms.socket.bean.Pose;
 import avrms.socket.message.MAVROSMessageParser;
 
 public class SocketApp {
@@ -98,6 +99,37 @@ public class SocketApp {
 				});
 				battery_mon.start();
 				
+				Thread pose_mon = new Thread(new Runnable() {
+					public void run() {
+						try {
+							Process proc = Runtime.getRuntime().exec("rostopic echo /"+node_name+"/local_position/pose");
+							_readOutPutForConsecutiveInfo(proc, "local_pose");
+
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (NumberFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IllegalArgumentException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IllegalAccessException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (NoSuchFieldException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (SecurityException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				});
+				pose_mon.start();
 				try {
 					gps_mon.join();
 				} catch (InterruptedException e) {
@@ -146,6 +178,22 @@ public class SocketApp {
 
 			if(msg_to_send!=null){
 				wsc.send(msg_to_send);
+			}
+		}
+	}
+	private static Pose pose_data = Pose.getInstance();
+	public static void _readOutPutForConsecutiveInfo(Process proc, String type)throws IOException, InterruptedException, NumberFormatException, IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException{
+		BufferedReader reader =  new BufferedReader(new InputStreamReader(proc.getInputStream()));
+		String line = "";
+		while((line = reader.readLine()) != null){
+
+			String json_data = msgparser.parseMessage(type, line);
+
+			if(json_data!=null){
+				Boolean sendOk = pose_data.processInfo(json_data);
+				if(sendOk){
+					wsc.send(pose_data.getResultJson());
+				}
 			}
 		}
 	}

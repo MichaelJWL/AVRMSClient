@@ -43,53 +43,6 @@ public class MAVROSMessageParser {
 		String[] data_name = {"latitude","longitude","altitude"};
 		return getParsedJsonMessage(data_name,msg);
 		
-//		
-//		String latitude_pattern = "latitude: (.)*";
-//		String longitude_pattern = "longitude: (.)*";
-//		String altitude_pattern = "altitude: (.)*";
-//		
-//		Matcher matcher = null;
-//		
-//		
-//		if(msg.matches(latitude_pattern)){
-//
-//			Pattern lat_pat = Pattern.compile("latitude: (.*)");
-//			matcher = lat_pat.matcher(msg);
-//			if(matcher.find()){
-//
-//				json = new JSONObject();
-//				json.put("latitude", matcher.group(1));
-//				
-//				result = json.toJSONString();
-//				
-//			}
-//		}else if(msg.matches(longitude_pattern)){
-//
-//			Pattern long_pat = Pattern.compile("longitude: (.*)");
-//			matcher = long_pat.matcher(msg);
-//			if(matcher.find()){
-//
-//				json = new JSONObject();
-//				json.put("longitude", matcher.group(1));
-//				
-//				result = json.toJSONString();
-//			}
-//		}else if(msg.matches(altitude_pattern)){
-//
-//			Pattern alt_pat = Pattern.compile("altitude: (.*)");
-//			matcher = alt_pat.matcher(msg);
-//			if(matcher.find()){
-//
-//				json = new JSONObject();
-//				json.put("altitude", matcher.group(1));
-//
-//				result = json.toJSONString();
-//			}
-//		}else{
-//
-//		}
-//		
-//		return result;
 	}
 	private String StateMessageParsing(String msg){
 		String[] data_name = {"connected","armed","guided","mode"};
@@ -97,21 +50,21 @@ public class MAVROSMessageParser {
 		return getParsedJsonMessage(data_name, msg);
 	}
 	private String LocalPoseMessageParsing(String msg){
+		String[] data_name = {"position","x","y","z","w","orientation"};
 		
-		
-		return null;
+		return getParsedJsonMessage(data_name, msg);
 	}
 	private String BatteryMessageParsing(String msg){
 		String[] data_name = {"voltage","current","remaining"};
 		return getParsedJsonMessage(data_name, msg);
 	}
 	private String ParsingProcess(String data_name,String info_msg){
-		String pattern = data_name+": (.)*";
+		String pattern = "\\s*"+data_name+": (.)*";
 		Matcher matcher = null;
 		String result_string = null;
 		if(info_msg.matches(pattern)){
 
-			Pattern _pat = Pattern.compile(data_name+": (.*)");
+			Pattern _pat = Pattern.compile("\\s*"+data_name+": (.*)");
 			matcher = _pat.matcher(info_msg);
 			if(matcher.find()){
 				result_string = matcher.group(1);

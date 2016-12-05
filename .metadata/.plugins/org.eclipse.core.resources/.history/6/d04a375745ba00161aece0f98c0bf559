@@ -1,0 +1,152 @@
+package avrms.socket.bean;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.json.simple.JSONObject;
+
+import com.google.gson.Gson;
+
+public class Pose {
+	private Double pos_x = 0.0;
+	private Double pos_y = 0.0;
+	private Double pos_z = 0.0;
+	
+	private Double ori_x = 0.0;
+	private Double ori_y = 0.0;
+	private Double ori_z = 0.0;
+	private Double ori_w = 0.0;
+	
+	private static Pose instance;
+	private static boolean p_f,p_x_f,p_y_f,p_z_f,o_f,o_x_f,o_y_f,o_z_f,o_w_f;
+	
+	private static final boolean[] pose_flag_arr = {p_f,p_x_f,p_y_f,p_z_f,o_f,o_x_f,o_y_f,o_z_f,o_w_f};
+	
+	private static HashMap<Integer, String> index_var_map;
+	private static int flag_pointer = 0;
+	
+	private String resultJson;
+	private Pose() {
+		// TODO Auto-generated constructor stub
+		
+		index_var_map = new HashMap<>();
+		index_var_map.put(1, "pos_x");
+		index_var_map.put(2, "pos_y");
+		index_var_map.put(3, "pos_z");
+		index_var_map.put(5, "ori_x");
+		index_var_map.put(6, "ori_y");
+		index_var_map.put(7, "ori_z");
+		index_var_map.put(8, "ori_w");
+	}
+	
+	public static Pose getInstance(){
+		if(instance==null){
+			instance = new Pose();
+			instance.initFlag();
+		}
+		return instance;
+	}
+	
+	public void initFlag(){
+		for (int i = 0; i < pose_flag_arr.length; i++) {
+			pose_flag_arr[i]=false;
+		}
+		flag_pointer = 0;
+	}
+	public Boolean processInfo(String jsonData) throws NumberFormatException, IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException{
+		Gson jsonParser = new Gson();
+		HashMap info = jsonParser.fromJson(jsonData, HashMap.class);
+		Set keySet = info.keySet();
+		Iterator it_key = keySet.iterator();
+		Boolean flag = false;
+//		System.out.println("processing data..."+info);
+		while(it_key.hasNext()){
+			String key = (String) it_key.next();
+
+			Boolean flagForNext =false;
+			if(key.equals("position")){
+				if(flag_pointer==0)
+					flagForNext = true;
+			}else if(key.equals("x")){
+				if(flag_pointer==1||flag_pointer ==5)
+					flagForNext = true;
+			}else if(key.equals("y")){
+				if(flag_pointer==2||flag_pointer ==6)
+					flagForNext = true;
+			}else if(key.equals("z")){
+				if(flag_pointer==3||flag_pointer ==7)
+					flagForNext = true;
+			}else if(key.equals("orientation")){
+				if(flag_pointer==4)
+					flagForNext = true;
+			}else if(key.equals("w")){
+				if(flag_pointer==8)
+					flagForNext = true;
+			}
+			
+			if(flagForNext){
+				pose_flag_arr[flag_pointer] = true;
+				String val = index_var_map.get(flag_pointer);
+				if(val!=null){
+					System.out.println("DEBUG::setting value of \'"+key+"\':"+val);
+					Field var = this.getClass().getField(val);
+					
+					var.setDouble(this,  Double.valueOf((String) info.get(key)));
+					
+				}
+				
+				if((flag_pointer+1)==pose_flag_arr.length){
+					/**
+					 * 데이터 완성
+					 */
+					flag = true;
+					initFlag();
+					resultJson = createJsonResult();
+				}else{
+					flag_pointer++;
+				}
+			}
+		}
+		return flag;
+	}
+	
+	private String createJsonResult(){
+		JSONObject obj = new JSONObject();
+		obj.put("pos_x", pos_x);
+		obj.put("pos_y", pos_y);
+		obj.put("pos_z", pos_z);
+		System.out.println("check:"+ori_x+", "+ ori_y+", "+", "+ ori_z+", "+ ori_w);
+		double [] eulerValue = quarternionToEuler(ori_x, ori_y, ori_z, ori_w);
+		System.out.println(eulerValue);
+		obj.put("ea_x", eulerValue[0]);
+		obj.put("ea_y", eulerValue[1]);
+		obj.put("ea_z", eulerValue[2]);
+		System.out.println(obj.toJSONString());
+		return obj.toJSONString();
+	}
+	private double[] quarternionToEuler(double qx, double qy, double qz, double qw){
+		
+		
+		double sqx = qx*qx;
+		double sqy = qx*qy;
+		double sqz = qx*qz;
+		double sqw = qw*qw;
+		
+		double PI = Math.PI;
+		
+		double e_x = (double)(Math.atan2(2.0 * (qy*qz + qx*qw), (-sqx - sqy + sqz + sqw))*PI);
+		double e_y = (double)(Math.asin(-2.0 * (qx*qz - qy*qw))*PI);
+		double e_z = (double)(Math.atan2(2.0 * (qx*qy + qz*qw), (sqx - sqy - sqz + sqw))*PI);
+		
+		double[] euler = {e_x,e_y,e_z} ;
+		return euler;
+		
+	}
+
+	public String getResultJson() {
+		return resultJson;
+	}
+	
+}
