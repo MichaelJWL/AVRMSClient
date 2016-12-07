@@ -1,9 +1,12 @@
 package avrms.socket.message;
 
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.json.simple.JSONObject;
+
+import com.google.gson.Gson;
 
 import avrms.socket.bean.NavSatFix;
 
@@ -33,11 +36,13 @@ public class MAVROSMessageParser {
 		case "test":
 			result_msg = msg;
 			break;
+		case "heading":
+			result_msg = HeadingMessageParsing(msg);
 		}
 		return result_msg;
 	}
 	
-	
+
 	private String GPSMessageParsing(String msg){
 		
 		String[] data_name = {"latitude","longitude","altitude"};
@@ -57,6 +62,22 @@ public class MAVROSMessageParser {
 	private String BatteryMessageParsing(String msg){
 		String[] data_name = {"voltage","current","remaining"};
 		return getParsedJsonMessage(data_name, msg);
+	}
+	private String HeadingMessageParsing(String msg){
+
+		String[] data_name = {"data"};
+		String parsed_data = getParsedJsonMessage(data_name, msg);
+		if(parsed_data!=null){
+			Gson jsonparser = new Gson();
+			HashMap result = jsonparser.fromJson(parsed_data, HashMap.class);
+			result.put("heading", result.get("data"));
+			result.remove("data");
+		
+			return jsonparser.toJson(result);
+		}else{
+			return null;
+		}
+		
 	}
 	private String ParsingProcess(String data_name,String info_msg){
 		String pattern = "\\s*"+data_name+": (.)*";
@@ -80,6 +101,7 @@ public class MAVROSMessageParser {
 		for (int i = 0; i < data_name.length; i++) {
 			String _data_name = data_name[i];
 			String parsedData = ParsingProcess(_data_name,msg);
+			
 			if(parsedData!=null){
 				json.put(_data_name, parsedData);
 			}
@@ -91,5 +113,6 @@ public class MAVROSMessageParser {
 		}
 	
 	}
+	
 	
 }

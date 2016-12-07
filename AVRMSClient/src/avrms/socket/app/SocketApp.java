@@ -98,7 +98,22 @@ public class SocketApp {
 					}
 				});
 				battery_mon.start();
-				
+				Thread heading_mon = new Thread(new Runnable() {
+					public void run() {
+						try {
+							Process proc = Runtime.getRuntime().exec("rostopic echo /"+node_name+"/global_position/compass_hdg");
+							_readOutPut(proc, "heading");
+
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				});
+				heading_mon.start();
 				Thread pose_mon = new Thread(new Runnable() {
 					public void run() {
 						try {
@@ -173,7 +188,7 @@ public class SocketApp {
 		BufferedReader reader =  new BufferedReader(new InputStreamReader(proc.getInputStream()));
 		String line = "";
 		while((line = reader.readLine()) != null){
-
+		
 			String msg_to_send = msgparser.parseMessage(type, line);
 
 			if(msg_to_send!=null){
