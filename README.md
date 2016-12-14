@@ -7,7 +7,7 @@ This program echos mavros topic that contains GPS information
 ===updated
 161204: AVRMSClient can give more information! (battery, vehicle state)
 161205: AVRMSClient can give attitude information!
-Current AVRMS Server Address = http://211.217.156.76:8080/avrms
+Currently AVRMS Server has closed! We'll open sooner!
 
 ****How to use****
 /**
